@@ -1,12 +1,14 @@
-
 import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { X } from 'lucide-react-native';
-import { SortearType } from '../../types';
+import { SortearType } from '../../types'; 
+
+// --- IMPORTS DOS FORMULÁRIOS ---
 import { NamesLotteryForm } from './NamesLotteryForm';
 import { NumbersLotteryForm } from './NumbersLotteryForm';
 import { SequenceLotteryForm } from './SequenceLotteryForm';
+import { GroupsLotteryForm } from './GroupsLotteryForm'; // <--- 1. TEM QUE TER ISSO
 
 interface SortearModalProps {
   visible: boolean;
@@ -15,33 +17,33 @@ interface SortearModalProps {
 }
 
 export function SortearModal({ visible, type, onClose }: SortearModalProps) {
+  
+  // 2. CONFIGURAR O TÍTULO
   const getTitle = () => {
     switch (type) {
-      case 'names':
-        return 'Sorteio de Nomes';
-      case 'numbers':
-        return 'Sorteio de Números';
-      case 'sequence':
-        return 'Sequência de Números';
-      default:
-        return '';
+      case 'names': return 'Sorteio de Nomes';
+      case 'numbers': return 'Sorteio de Números';
+      case 'sequence': return 'Sequência de Números';
+      case 'groups': return 'Sorteio de Grupos'; // <--- OBRIGATÓRIO
+      default: return 'Sorteio';
     }
   };
 
-  const getGradient = () => {
+  // 3. CONFIGURAR A COR DE FUNDO
+  const getGradient = (): [string, string] => {
     switch (type) {
-      case 'names':
-        return ['#667eea', '#764ba2'];
-      case 'numbers':
-        return ['#f093fb', '#f5576c'];
-      case 'sequence':
-        return ['#4facfe', '#00f2fe'];
-      default:
-        return ['#667eea', '#764ba2'];
+      case 'names': return ['#667eea', '#764ba2'];
+      case 'numbers': return ['#f093fb', '#f5576c'];
+      case 'sequence': return ['#4facfe', '#00f2fe'];
+      case 'groups': return ['#8b5cf6', '#a78bfa']; // <--- OBRIGATÓRIO
+      default: return ['#667eea', '#764ba2'];
     }
   };
 
+  // 4. CONFIGURAR QUAL TELA MOSTRAR (AQUI ESTÁ O SEU ERRO PROVAVELMENTE)
   const renderForm = () => {
+    if (!type) return null;
+
     switch (type) {
       case 'names':
         return <NamesLotteryForm onClose={onClose} />;
@@ -49,6 +51,8 @@ export function SortearModal({ visible, type, onClose }: SortearModalProps) {
         return <NumbersLotteryForm onClose={onClose} />;
       case 'sequence':
         return <SequenceLotteryForm onClose={onClose} />;
+      case 'groups':
+        return <GroupsLotteryForm onClose={onClose} />; // <--- SE NÃO TIVER ISSO, A TELA FICA BRANCA
       default:
         return null;
     }
@@ -59,9 +63,11 @@ export function SortearModal({ visible, type, onClose }: SortearModalProps) {
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
+      onRequestClose={onClose}
     >
       <LinearGradient colors={getGradient()} style={styles.container}>
         <SafeAreaView style={styles.container}>
+          
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <Text style={styles.title}>{getTitle()}</Text>
@@ -74,6 +80,7 @@ export function SortearModal({ visible, type, onClose }: SortearModalProps) {
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {renderForm()}
           </ScrollView>
+
         </SafeAreaView>
       </LinearGradient>
     </Modal>

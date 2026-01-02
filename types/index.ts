@@ -1,8 +1,15 @@
-export type SortearType = 'names' | 'numbers' | 'sequence';
+export type SortearType = 'names' | 'numbers' | 'sequence' | 'groups'; 
 
 export interface Name {
   id: string;
   value: string;
+}
+
+export interface SavedList {
+  id: string;
+  title: string;
+  names: string[]; // Array de strings (os nomes)
+  createdAt: number;
 }
 
 export interface SortearResult {

@@ -1,11 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { CreditCard as Edit3, Trash2, Check, X } from 'lucide-react-native';
+import { Edit3, Trash2, Check, X } from 'lucide-react-native';
 import { Name } from '../../types';
 import { useState } from 'react';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
   Layout,
   SlideInRight,
   SlideOutLeft
@@ -15,9 +12,10 @@ interface NamesListProps {
   names: Name[];
   onRemoveName: (id: string) => void;
   onEditName: (id: string, newValue: string) => void;
+  onClearAll?: () => void; // <--- NOVA PROPRIEDADE OPCIONAL
 }
 
-export function NamesList({ names, onRemoveName, onEditName }: NamesListProps) {
+export function NamesList({ names, onRemoveName, onEditName, onClearAll }: NamesListProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
 
@@ -42,7 +40,7 @@ export function NamesList({ names, onRemoveName, onEditName }: NamesListProps) {
   const handleRemove = (name: Name) => {
     Alert.alert(
       'Confirmar exclusão',
-      `Deseja remover "${name.value}" da lista?`,
+      `Deseja remover "${name.value}"?`,
       [
         { text: 'Cancelar', style: 'cancel' },
         { text: 'Remover', style: 'destructive', onPress: () => onRemoveName(name.id) },
@@ -50,12 +48,25 @@ export function NamesList({ names, onRemoveName, onEditName }: NamesListProps) {
     );
   };
 
+  // Nova função para limpar tudo com confirmação
+  const handleClearAll = () => {
+    if (!onClearAll) return;
+    Alert.alert(
+      'Limpar Lista',
+      'Tem certeza que deseja apagar TODOS os nomes?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Apagar Tudo', style: 'destructive', onPress: onClearAll },
+      ]
+    );
+  };
+
   if (names.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>Nenhum nome foi adicionado ainda</Text>
+        <Text style={styles.emptyText}>Sua lista está vazia</Text>
         <Text style={styles.emptySubtext}>
-          Use o formulário acima para adicionar nomes à sua lista
+          Adicione nomes um por um ou cole uma lista separada por vírgulas.
         </Text>
       </View>
     );
@@ -63,7 +74,16 @@ export function NamesList({ names, onRemoveName, onEditName }: NamesListProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lista de Nomes ({names.length})</Text>
+      {/* HEADER DA LISTA COM BOTÃO LIMPAR */}
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Lista de Nomes ({names.length})</Text>
+        {onClearAll && (
+          <TouchableOpacity onPress={handleClearAll} style={styles.clearAllButton}>
+            <Text style={styles.clearAllText}>Limpar</Text>
+            <Trash2 size={16} color="#ef4444" />
+          </TouchableOpacity>
+        )}
+      </View>
       
       <View style={styles.list}>
         {names.map((name, index) => (
@@ -130,11 +150,27 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1e293b',
-    marginBottom: 16,
+  },
+  clearAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    padding: 4,
+  },
+  clearAllText: {
+    fontSize: 12,
+    color: '#ef4444',
+    fontWeight: '600',
   },
   list: {
     gap: 12,

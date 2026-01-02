@@ -15,7 +15,7 @@ import {
   Info 
 } from 'lucide-react-native';
 
-// --- IMPORTS DOS SEUS COMPONENTES (Ajustados para ./src) ---
+// --- IMPORTS DOS COMPONENTES ---
 import { SortearHeader } from './src/components/SortearHeader';
 import { SortearCard } from './src/components/SortearCard';
 import { SortearModal } from './src/components/SortearModal';
@@ -24,6 +24,7 @@ import { SortearModal } from './src/components/SortearModal';
 import { NamesHeader } from './src/components/NamesHeader';
 import { AddNameForm } from './src/components/AddNameForm';
 import { NamesList } from './src/components/NamesList';
+import { SavedLists } from './src/components/SavedLists'; // Componente de Listas Salvas
 import { ImportNamesModal } from './src/components/ImportNamesModal';
 
 // Imports da Tela de Configurações
@@ -34,18 +35,17 @@ import { SettingsItem } from './src/components/SettingsItem';
 // Imports dos Hooks
 import { useTheme } from './src/hooks/useTheme';
 import { useNames } from './src/hooks/useNames';
-import { SortearType } from './types'; // Verifique se o caminho está certo
+import { SortearType } from './types'; 
 
-// --- TELA 1: SORTEAR (Sua tela inicial) ---
+// --- TELA 1: SORTEAR ---
 function SortearScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [sortearType, setSortearType] = useState<SortearType | null>(null);
   
-  // Tenta pegar o tema, se o hook falhar (sem provider), usa padrão 'light'
   const themeContext = tryUseTheme(); 
   const isDark = themeContext?.theme === 'dark';
 
-  const handleOpenModal = (type: SortearType) => {
+  const handleOpenModal = (type: any) => {
     setSortearType(type);
     setModalVisible(true);
   };
@@ -86,6 +86,13 @@ function SortearScreen() {
               gradient={['#4facfe', '#00f2fe']}
               onPress={() => handleOpenModal('sequence')}
             />
+            <SortearCard
+              title="Sorteio de Grupos"
+              description="Divida a galera em times"
+              icon="users" 
+              gradient={['#8b5cf6', '#a78bfa']}
+              onPress={() => handleOpenModal('groups')}
+            />
           </View>
         </ScrollView>
 
@@ -99,14 +106,29 @@ function SortearScreen() {
   );
 }
 
-// --- TELA 2: NOMES (Código Integrado) ---
+// --- TELA 2: NOMES ---
 function NamesScreen() {
-  const { names, addName, removeName, editName, clearAllNames, importNames } = useNames();
+  const { 
+    names, 
+    addName, 
+    removeName, 
+    editName, 
+    clearAllNames, 
+    importNames, 
+    savedLists, 
+    removeList,
+    updateList // <--- Importante: Função para atualizar listas editadas
+  } = useNames();
+  
   const [importModalVisible, setImportModalVisible] = useState(false);
-
-  // Tenta pegar o tema para o fundo
   const themeContext = tryUseTheme(); 
   const isDark = themeContext?.theme === 'dark';
+
+  // Função para carregar a lista salva na lista principal (Nomes Soltos)
+  const handleLoadList = (list: any) => {
+    const namesText = list.names.join('\n');
+    importNames(namesText);
+  };
 
   return (
     <LinearGradient
@@ -122,11 +144,24 @@ function NamesScreen() {
         
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.contentPadded}>
+            
+            {/* 1. Formulário Inteligente (Cria listas ou adiciona soltos) */}
             <AddNameForm onAddName={addName} />
+
+            {/* 2. Carrossel de Listas Salvas (Edita, Apaga e Carrega) */}
+            <SavedLists 
+              lists={savedLists} 
+              onDelete={removeList} 
+              onLoad={handleLoadList}
+              onUpdate={updateList} 
+            />
+
+            {/* 3. Lista de Nomes Soltos (Atuais) */}
             <NamesList 
               names={names}
               onRemoveName={removeName}
               onEditName={editName}
+              onClearAll={clearAllNames}
             />
           </View>
         </ScrollView>
@@ -141,11 +176,10 @@ function NamesScreen() {
   );
 }
 
-// --- TELA 3: CONFIGURAÇÕES (Código Integrado) ---
+// --- TELA 3: CONFIGURAÇÕES ---
 function SettingsScreen() {
   const { theme, toggleTheme } = useTheme();
   const { clearAllNames } = useNames();
-
   const isDark = theme === 'dark';
 
   return (
@@ -156,7 +190,6 @@ function SettingsScreen() {
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <SettingsHeader />
-          
           <View style={styles.contentPadded}>
             <SettingsSection title="Aparência">
               <SettingsItem
@@ -167,7 +200,6 @@ function SettingsScreen() {
                 showArrow={false}
               />
             </SettingsSection>
-
             <SettingsSection title="Dados">
               <SettingsItem
                 title="Limpar Lista de Nomes"
@@ -185,7 +217,6 @@ function SettingsScreen() {
                 showArrow={false}
               />
             </SettingsSection>
-
             <SettingsSection title="Sobre">
               <SettingsItem
                 title="Informações do App"
@@ -202,10 +233,9 @@ function SettingsScreen() {
   );
 }
 
-// --- CONFIGURAÇÃO DO MENU (TABS) ---
+// --- MENU (TABS) ---
 const Tab = createBottomTabNavigator();
 
-// Função auxiliar para evitar erro se o ThemeProvider não estiver configurado
 function tryUseTheme() {
   try {
     return useTheme();
@@ -215,20 +245,10 @@ function tryUseTheme() {
 }
 
 export default function App() {
-  // ⚠️ IMPORTANTE: Se você tiver ThemeProvider e NamesProvider, 
-  // envolva o NavigationContainer com eles aqui.
-  // Exemplo:
-  // return (
-  //   <ThemeProvider>
-  //     <NamesProvider>
-  //        <NavigationContainer> ... </NavigationContainer>
-  //     </NamesProvider>
-  //   </ThemeProvider>
-  // )
-
   return (
     <NavigationContainer>
       <Tab.Navigator
+        id="MainTabs"
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: '#6366f1',
