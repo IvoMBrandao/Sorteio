@@ -1,6 +1,7 @@
 import { View, TextInput, TouchableOpacity, StyleSheet, Text, Keyboard, Alert } from 'react-native';
 import { Plus, ListPlus } from 'lucide-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next'; // Adicionado para tradução
 import { SaveListModal } from './SaveListModal';
 import { useNames } from '../hooks/useNames';
 
@@ -8,18 +9,17 @@ interface AddNameFormProps {
   onAddName: (name: string) => void;
 }
 
+// ✅ Exportação exata para resolver o erro no App.tsx
 export function AddNameForm({ onAddName }: AddNameFormProps) {
-  // Pegamos o addList e o importNames do hook atualizado
+  const { t } = useTranslation();
   const { addList, importNames } = useNames(); 
   
   const [inputValue, setInputValue] = useState('');
   const [showSaveListModal, setShowSaveListModal] = useState(false);
   const [pendingNames, setPendingNames] = useState<string[]>([]);
 
-  // Detecta se tem vírgula ou Enter
   const isList = inputValue.includes(',') || inputValue.includes('\n');
 
-  // Limpa o texto cru e transforma em array
   const parseNames = (text: string) => {
     return text
       .split(/[\n,]/)
@@ -31,36 +31,32 @@ export function AddNameForm({ onAddName }: AddNameFormProps) {
     if (!inputValue.trim()) return;
 
     if (!isList) {
-      // Se for nome único, adiciona direto
       onAddName(inputValue.trim());
       setInputValue('');
       return;
     }
 
-    // SE FOR UMA LISTA, PERGUNTA O QUE FAZER
     const namesFound = parseNames(inputValue);
     
     Alert.alert(
-      'Lista Detectada',
-      `Identificamos ${namesFound.length} nomes. O que deseja fazer?`,
+      t('names.import.alertTitle'),
+      t('names.import.alertMessage', { count: namesFound.length }),
       [
         {
-          text: 'Cancelar',
+          text: t('common.cancel'),
           style: 'cancel'
         },
         {
-          text: 'Adicionar Individuais',
+          text: t('names.import.addIndividual'),
           onPress: () => {
-            // Adiciona soltos na lista atual do sorteio
             importNames(inputValue);
             setInputValue('');
             Keyboard.dismiss();
           }
         },
         {
-          text: 'Criar Nova Lista',
+          text: t('names.import.createList'),
           onPress: () => {
-            // Guarda os nomes temporariamente e abre o modal de nomear
             setPendingNames(namesFound);
             setShowSaveListModal(true);
           }
@@ -70,7 +66,6 @@ export function AddNameForm({ onAddName }: AddNameFormProps) {
   };
 
   const handleSaveList = (listName: string) => {
-    // Salva como uma lista separada
     addList(listName, pendingNames);
     
     setInputValue('');
@@ -78,7 +73,7 @@ export function AddNameForm({ onAddName }: AddNameFormProps) {
     setShowSaveListModal(false);
     Keyboard.dismiss();
     
-    Alert.alert('Sucesso', `Lista "${listName}" criada com sucesso!`);
+    Alert.alert(t('common.success'), t('names.import.listCreated', { name: listName }));
   };
 
   return (
@@ -86,7 +81,7 @@ export function AddNameForm({ onAddName }: AddNameFormProps) {
       <View style={styles.inputContainer}>
         <TextInput
           style={[styles.input, isList && styles.inputMultiline]}
-          placeholder={isList ? "Lista detectada..." : "Adicionar nome (ou cole uma lista)"}
+          placeholder={isList ? t('names.import.listDetected') : t('names.import.placeholder')}
           placeholderTextColor="#94a3b8"
           value={inputValue}
           onChangeText={setInputValue}
@@ -107,11 +102,10 @@ export function AddNameForm({ onAddName }: AddNameFormProps) {
       
       {isList && (
         <Text style={styles.helperText}>
-          Lista detectada. Clique para escolher como salvar.
+          {t('names.import.helper')}
         </Text>
       )}
 
-      {/* MODAL APARECE QUANDO ESCOLHE "CRIAR LISTA" */}
       <SaveListModal 
         visible={showSaveListModal}
         itemCount={pendingNames.length}

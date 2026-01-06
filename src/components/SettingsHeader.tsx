@@ -1,14 +1,21 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Settings } from 'lucide-react-native';
 
 export function SettingsHeader() {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
         <Settings size={32} color="#ffffff" strokeWidth={2.5} />
       </View>
-      <Text style={styles.title}>Configurações</Text>
-      <Text style={styles.subtitle}>Personalize sua experiência</Text>
+      <Text style={styles.title}>
+        {t('settings.header.title')}
+      </Text>
+      <Text style={styles.subtitle}>
+        {t('settings.header.subtitle')}
+      </Text>
     </View>
   );
 }

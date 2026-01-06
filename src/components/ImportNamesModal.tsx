@@ -1,6 +1,7 @@
 import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient'; 
+import { useTranslation } from 'react-i18next';
 import { X, Download } from 'lucide-react-native';
 import { useState } from 'react';
 
@@ -11,6 +12,7 @@ interface ImportNamesModalProps {
 }
 
 export function ImportNamesModal({ visible, onClose, onImport }: ImportNamesModalProps) {
+  const { t } = useTranslation();
   const [namesText, setNamesText] = useState('');
 
   const handleImport = () => {
@@ -35,7 +37,9 @@ export function ImportNamesModal({ visible, onClose, onImport }: ImportNamesModa
       <LinearGradient colors={['#667eea', '#764ba2']} style={styles.container}>
         <SafeAreaView style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Importar Nomes</Text>
+            <Text style={styles.title}>
+              {t('names.importModal.title')}
+            </Text>
             <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
               <X size={24} color="#ffffff" strokeWidth={2.5} />
             </TouchableOpacity>
@@ -43,17 +47,19 @@ export function ImportNamesModal({ visible, onClose, onImport }: ImportNamesModa
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             <View style={styles.card}>
-              <Text style={styles.instructionTitle}>Como importar?</Text>
+              <Text style={styles.instructionTitle}>
+                {t('names.importModal.howToTitle')}
+              </Text>
               <Text style={styles.instruction}>
-                • Separe os nomes por vírgula ou quebra de linha{'\n'}
-                • Exemplo: João, Maria, Pedro{'\n'}
-                • Ou um nome por linha
+                {t('names.importModal.instruction')}
               </Text>
 
-              <Text style={styles.inputLabel}>Lista de nomes:</Text>
+              <Text style={styles.inputLabel}>
+                {t('names.importModal.inputLabel')}
+              </Text>
               <TextInput
                 style={styles.textArea}
-                placeholder="Digite ou cole os nomes aqui..."
+                placeholder={t('names.importModal.placeholder')}
                 value={namesText}
                 onChangeText={setNamesText}
                 multiline
@@ -68,7 +74,9 @@ export function ImportNamesModal({ visible, onClose, onImport }: ImportNamesModa
                 disabled={!namesText.trim()}
               >
                 <Download size={20} color="#ffffff" strokeWidth={2.5} />
-                <Text style={styles.importButtonText}>Importar Nomes</Text>
+                <Text style={styles.importButtonText}>
+                  {t('names.importModal.button')}
+                </Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -111,7 +119,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { 
+      width: 0, 
+      height: 2 
+    },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,

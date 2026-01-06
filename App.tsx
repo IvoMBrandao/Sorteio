@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import './src/i18n';
+import { View, StyleSheet, ScrollView, Platform, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import { 
   Dice6, 
   Users, 
@@ -12,40 +14,42 @@ import {
   Sun, 
   Trash2, 
   RotateCcw, 
-  Info 
+  Info,
+  Languages,
+  Hash,
+  List
 } from 'lucide-react-native';
 
 // --- IMPORTS DOS COMPONENTES ---
 import { SortearHeader } from './src/components/SortearHeader';
 import { SortearCard } from './src/components/SortearCard';
 import { SortearModal } from './src/components/SortearModal';
-
-// Imports da Tela de Nomes
 import { NamesHeader } from './src/components/NamesHeader';
 import { AddNameForm } from './src/components/AddNameForm';
 import { NamesList } from './src/components/NamesList';
-import { SavedLists } from './src/components/SavedLists'; // Componente de Listas Salvas
+import { SavedLists } from './src/components/SavedLists'; 
 import { ImportNamesModal } from './src/components/ImportNamesModal';
-
-// Imports da Tela de Configurações
 import { SettingsHeader } from './src/components/SettingsHeader';
 import { SettingsSection } from './src/components/SettingsSection';
 import { SettingsItem } from './src/components/SettingsItem';
 
-// Imports dos Hooks
+// --- IMPORTS DOS HOOKS ---
 import { useTheme } from './src/hooks/useTheme';
 import { useNames } from './src/hooks/useNames';
 import { SortearType } from './types'; 
 
+const Tab = createBottomTabNavigator();
+
 // --- TELA 1: SORTEAR ---
 function SortearScreen() {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const [modalVisible, setModalVisible] = useState(false);
   const [sortearType, setSortearType] = useState<SortearType | null>(null);
-  
-  const themeContext = tryUseTheme(); 
-  const isDark = themeContext?.theme === 'dark';
 
-  const handleOpenModal = (type: any) => {
+  const handleOpenModal = (type: SortearType) => {
     setSortearType(type);
     setModalVisible(true);
   };
@@ -57,40 +61,40 @@ function SortearScreen() {
 
   return (
     <LinearGradient 
-      colors={isDark ? ['#1a1a2e', '#16213e'] : ['#667eea', '#764ba2']} 
+      colors={isDark ? ['#1a1a2e', '#16213e'] as const : ['#667eea', '#764ba2'] as const} 
       style={styles.container}
     >
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <SortearHeader />
           
           <View style={styles.cardsContainer}>
             <SortearCard
-              title="Sorteio de Nomes"
-              description="Sorteie nomes da sua lista salva"
+              title={t('sortear.names.title')}
+              description={t('sortear.names.description')}
               icon="users"
-              gradient={['#667eea', '#764ba2']}
+              gradient={['#667eea', '#764ba2'] as const}
               onPress={() => handleOpenModal('names')}
             />
             <SortearCard
-              title="Sorteio de Números"
-              description="Sorteie números em um intervalo"
+              title={t('sortear.numbers.title')}
+              description={t('sortear.numbers.description')}
               icon="hash"
-              gradient={['#f093fb', '#f5576c']}
+              gradient={['#f093fb', '#f5576c'] as const}
               onPress={() => handleOpenModal('numbers')}
             />
             <SortearCard
-              title="Sequência de Números"
-              description="Gere uma sequência de números"
+              title={t('sortear.sequence.title')}
+              description={t('sortear.sequence.description')}
               icon="list"
-              gradient={['#4facfe', '#00f2fe']}
+              gradient={['#4facfe', '#00f2fe'] as const}
               onPress={() => handleOpenModal('sequence')}
             />
             <SortearCard
-              title="Sorteio de Grupos"
-              description="Divida a galera em times"
-              icon="users" 
-              gradient={['#8b5cf6', '#a78bfa']}
+              title={t('sortear.groups.title')}
+              description={t('sortear.groups.description')}
+              icon="grid" 
+              gradient={['#8b5cf6', '#a78bfa'] as const}
               onPress={() => handleOpenModal('groups')}
             />
           </View>
@@ -108,23 +112,17 @@ function SortearScreen() {
 
 // --- TELA 2: NOMES ---
 function NamesScreen() {
+  const { t } = useTranslation();
   const { 
-    names, 
-    addName, 
-    removeName, 
-    editName, 
-    clearAllNames, 
-    importNames, 
-    savedLists, 
-    removeList,
-    updateList // <--- Importante: Função para atualizar listas editadas
+    names, addName, removeName, editName, 
+    clearAllNames, importNames, savedLists, 
+    removeList, updateList 
   } = useNames();
   
   const [importModalVisible, setImportModalVisible] = useState(false);
-  const themeContext = tryUseTheme(); 
-  const isDark = themeContext?.theme === 'dark';
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
-  // Função para carregar a lista salva na lista principal (Nomes Soltos)
   const handleLoadList = (list: any) => {
     const namesText = list.names.join('\n');
     importNames(namesText);
@@ -132,10 +130,10 @@ function NamesScreen() {
 
   return (
     <LinearGradient
-      colors={isDark ? ['#1a1a2e', '#16213e'] : ['#667eea', '#764ba2']}
+      colors={isDark ? ['#1a1a2e', '#16213e'] as const : ['#667eea', '#764ba2'] as const}
       style={styles.container}
     >
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <NamesHeader 
           onImport={() => setImportModalVisible(true)}
           onClearAll={clearAllNames}
@@ -144,19 +142,13 @@ function NamesScreen() {
         
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.contentPadded}>
-            
-            {/* 1. Formulário Inteligente (Cria listas ou adiciona soltos) */}
             <AddNameForm onAddName={addName} />
-
-            {/* 2. Carrossel de Listas Salvas (Edita, Apaga e Carrega) */}
             <SavedLists 
               lists={savedLists} 
               onDelete={removeList} 
               onLoad={handleLoadList}
               onUpdate={updateList} 
             />
-
-            {/* 3. Lista de Nomes Soltos (Atuais) */}
             <NamesList 
               names={names}
               onRemoveName={removeName}
@@ -178,54 +170,81 @@ function NamesScreen() {
 
 // --- TELA 3: CONFIGURAÇÕES ---
 function SettingsScreen() {
+  const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const { clearAllNames } = useNames();
   const isDark = theme === 'dark';
 
+  const toggleLanguage = () => {
+    const nextLang = i18n.language.startsWith('pt') ? 'en' : 'pt';
+    i18n.changeLanguage(nextLang);
+  };
+
+  const handleResetHistory = () => {
+    Alert.alert(t('common.confirm'), t('settings.items.resetHistory.description'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('common.remove'), style: 'destructive' }
+    ]);
+  };
+
   return (
     <LinearGradient
-      colors={isDark ? ['#1a1a2e', '#16213e'] : ['#667eea', '#764ba2']}
+      colors={isDark ? ['#1a1a2e', '#16213e'] as const : ['#667eea', '#764ba2'] as const}
       style={styles.container}
     >
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <SettingsHeader />
           <View style={styles.contentPadded}>
-            <SettingsSection title="Aparência">
+            
+            <SettingsSection title={t('settings.sections.appearance')}>
               <SettingsItem
-                title="Tema"
-                description={isDark ? 'Escuro' : 'Claro'}
+                title={t('settings.items.theme.title')}
+                description={isDark ? t('settings.items.theme.dark') : t('settings.items.theme.light')}
                 icon={isDark ? Moon : Sun}
                 onPress={toggleTheme}
                 showArrow={false}
               />
             </SettingsSection>
-            <SettingsSection title="Dados">
+
+            <SettingsSection title={t('settings.sections.language')}>
               <SettingsItem
-                title="Limpar Lista de Nomes"
-                description="Remove todos os nomes salvos"
+                title={t('settings.items.language.title')}
+                description={i18n.language.startsWith('pt') ? "Português" : "English"}
+                icon={Languages}
+                onPress={toggleLanguage}
+                showArrow={true}
+              />
+            </SettingsSection>
+
+            <SettingsSection title={t('settings.sections.data')}>
+              <SettingsItem
+                title={t('settings.items.clearNames.title')}
+                description={t('settings.items.clearNames.description')}
                 icon={Trash2}
                 onPress={clearAllNames}
                 showArrow={false}
                 destructive
               />
               <SettingsItem
-                title="Resetar Histórico"
-                description="Limpa o histórico de sorteios"
+                title={t('settings.items.resetHistory.title')}
+                description={t('settings.items.resetHistory.description')}
                 icon={RotateCcw}
-                onPress={() => {}}
+                onPress={handleResetHistory}
                 showArrow={false}
               />
             </SettingsSection>
-            <SettingsSection title="Sobre">
+
+            <SettingsSection title={t('settings.sections.about')}>
               <SettingsItem
-                title="Informações do App"
-                description="Versão 1.0.0 • Premium"
+                title={t('settings.items.appInfo.title')}
+                description={t('settings.items.appInfo.description')}
                 icon={Info}
                 onPress={() => {}}
                 showArrow={false}
               />
             </SettingsSection>
+
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -233,36 +252,26 @@ function SettingsScreen() {
   );
 }
 
-// --- MENU (TABS) ---
-const Tab = createBottomTabNavigator();
-
-function tryUseTheme() {
-  try {
-    return useTheme();
-  } catch (e) {
-    return { theme: 'light' };
-  }
-}
-
+// --- MENU PRINCIPAL (TABS) ---
 export default function App() {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
     <NavigationContainer>
       <Tab.Navigator
-        id="MainTabs"
+        id="MainTabNavigator" // Correção do erro de ID do TS
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: '#6366f1',
-          tabBarInactiveTintColor: '#64748b',
+          tabBarActiveTintColor: isDark ? '#818cf8' : '#6366f1',
+          tabBarInactiveTintColor: isDark ? '#94a3b8' : '#64748b',
           tabBarStyle: {
-            backgroundColor: '#ffffff',
+            backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
             borderTopWidth: 0,
             elevation: 8,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            height: 70,
-            paddingBottom: 10,
+            height: Platform.OS === 'ios' ? 85 : 70,
+            paddingBottom: Platform.OS === 'ios' ? 25 : 12,
             paddingTop: 10,
           },
           tabBarLabelStyle: {
@@ -275,6 +284,7 @@ export default function App() {
           name="Sortear" 
           component={SortearScreen} 
           options={{
+            title: t('header.title'),
             tabBarIcon: ({ color, size }) => (
               <Dice6 size={size} color={color} strokeWidth={2.5} />
             ),
@@ -284,6 +294,7 @@ export default function App() {
           name="Nomes" 
           component={NamesScreen} 
           options={{
+            title: t('names.header.title'),
             tabBarIcon: ({ color, size }) => (
               <Users size={size} color={color} strokeWidth={2.5} />
             ),
@@ -293,6 +304,7 @@ export default function App() {
           name="Configurações" 
           component={SettingsScreen} 
           options={{
+            title: t('settings.header.title'),
             tabBarIcon: ({ color, size }) => (
               <Settings size={size} color={color} strokeWidth={2.5} />
             ),
@@ -304,18 +316,8 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  cardsContainer: {
-    padding: 20,
-    gap: 16,
-  },
-  contentPadded: {
-    padding: 20,
-    gap: 20,
-  },
+  container: { flex: 1 },
+  scrollView: { flex: 1 },
+  cardsContainer: { padding: 20, gap: 16 },
+  contentPadded: { padding: 20, gap: 20 },
 });

@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { X, RotateCcw, Trophy } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -46,13 +47,14 @@ export function ResultModal({
   onClose,
   onNewDraw,
 }: ResultModalProps) {
+  const { t } = useTranslation();
   const [visibleResults, setVisibleResults] = useState<ResultItemData[]>([]);
   const [isSorting, setIsSorting] = useState(false);
   const [runId, setRunId] = useState(0);
   
   const scrollViewRef = useRef<ScrollView>(null);
 
-  /* 🏆 ÍCONE */
+  /* 🏆 CONFIGURAÇÃO DE ANIMAÇÃO */
   const iconScale = useSharedValue(0);
   const feedbackOpacity = useSharedValue(0);
 
@@ -121,16 +123,6 @@ export function ResultModal({
     transform: [{ scale: iconScale.value }],
   }));
 
-  const feedbackStyle = useAnimatedStyle(() => ({
-    opacity: feedbackOpacity.value,
-  }));
-
-  // ✅ NOVO GRADIENTE: Azul Puro (Blue 500 -> Blue 800)
-  // Sem roxo, sem verde. Apenas azul.
-  const getGradient = () => {
-    return ['#3b82f6', '#1e3a8a']; 
-  };
-
   const handleNewDraw = () => {
     setVisibleResults([]);
     setIsSorting(false);
@@ -138,18 +130,17 @@ export function ResultModal({
     onNewDraw();
   };
 
-  // ✅ LÓGICA DE FONTE: Ajusta se o número for grande (3 ou 4 dígitos)
   const getFontSize = (val: string | number) => {
     const str = String(val);
-    if (str.length >= 4) return BALL_SIZE * 0.32; // Pequeno para 1000+
-    if (str.length === 3) return BALL_SIZE * 0.38; // Médio para 100+
-    return BALL_SIZE * 0.45; // Normal para 1-99
+    if (str.length >= 4) return BALL_SIZE * 0.32;
+    if (str.length === 3) return BALL_SIZE * 0.38;
+    return BALL_SIZE * 0.45;
   };
 
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
       <View style={styles.overlay}>
-        <LinearGradient colors={getGradient()} style={styles.container}>
+        <LinearGradient colors={['#3b82f6', '#1e3a8a'] as const} style={styles.container}>
           <SafeAreaView style={styles.safeArea}>
             
             <View style={styles.header}>
@@ -163,9 +154,9 @@ export function ResultModal({
                 <Trophy size={40} color="#fff" fill="#fff" />
               </Animated.View>
 
-              <Text style={styles.title}>Sorteio Realizado</Text>
-
-             
+              <Text style={styles.title}>
+                {t('sortear.modal.resultTitle')}
+              </Text>
 
               <View style={styles.listWrapper}>
                 <ScrollView
@@ -183,9 +174,6 @@ export function ResultModal({
                     >
                       <View style={styles.ball}>
                         <View style={styles.ballShine} />
-                        {/* ✅ APLICANDO FONTE DINÂMICA
-                          Cor: Azul escuro para combinar com o fundo azul
-                        */}
                         <Text style={[styles.ballText, { fontSize: getFontSize(item.value) }]}>
                           {String(item.value).padStart(2, '0')}
                         </Text>
@@ -203,7 +191,7 @@ export function ResultModal({
               >
                 <RotateCcw size={20} color={isSorting ? "rgba(255,255,255,0.5)" : "#fff"} />
                 <Text style={[styles.actionText, isSorting && { opacity: 0.5 }]}>
-                  {isSorting ? "Aguarde..." : "Sortear novamente"}
+                  {isSorting ? t('common.wait') : t('sortear.modal.drawAgain')}
                 </Text>
               </TouchableOpacity>
 
@@ -277,20 +265,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 4,
   },
-  feedback: {
-    color: '#dbeafe', // Azul bem clarinho
-    fontSize: 16,
-    fontWeight: '600',
-    backgroundColor: 'rgba(0,0,0,0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    marginBottom: 12,
-    overflow: 'hidden',
-  },
-  divider: {
-    height: 12,
-  },
   listWrapper: {
     flex: 1,
     width: '100%',
@@ -333,13 +307,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.05)',
   },
   ballText: {
-    // fontSize agora é controlado dinamicamente no componente
     fontWeight: '800',
-    color: '#1e3a8a', // <--- Azul Escuro Profundo (Legibilidade perfeita no azul)
+    color: '#1e3a8a',
     fontVariant: ['tabular-nums'],
   },
   orderText: {
-    color: '#bfdbfe', // <--- Azul Claro (Blue 200)
+    color: '#bfdbfe',
     fontSize: 11,
     fontWeight: '700',
   },
@@ -354,7 +327,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)'
+    borderColor: 'rgba(255,255,255,0.25)',
   },
   actionText: {
     color: '#fff',

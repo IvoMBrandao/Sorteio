@@ -1,14 +1,21 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Dice6 } from 'lucide-react-native';
 
 export function SortearHeader() {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
         <Dice6 size={32} color="#ffffff" strokeWidth={2.5} />
       </View>
-      <Text style={styles.title}>Sortear</Text>
-      <Text style={styles.subtitle}>Escolha o tipo de sorteio que deseja realizar</Text>
+      <Text style={styles.title}>
+        {t('sortear.header.title')}
+      </Text>
+      <Text style={styles.subtitle}>
+        {t('sortear.header.subtitle')}
+      </Text>
     </View>
   );
 }

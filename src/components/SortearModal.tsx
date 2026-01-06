@@ -1,4 +1,5 @@
 import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { X } from 'lucide-react-native';
@@ -8,7 +9,7 @@ import { SortearType } from '../../types';
 import { NamesLotteryForm } from './NamesLotteryForm';
 import { NumbersLotteryForm } from './NumbersLotteryForm';
 import { SequenceLotteryForm } from './SequenceLotteryForm';
-import { GroupsLotteryForm } from './GroupsLotteryForm'; // <--- 1. TEM QUE TER ISSO
+import { GroupsLotteryForm } from './GroupsLotteryForm';
 
 interface SortearModalProps {
   visible: boolean;
@@ -17,30 +18,28 @@ interface SortearModalProps {
 }
 
 export function SortearModal({ visible, type, onClose }: SortearModalProps) {
+  const { t } = useTranslation();
   
-  // 2. CONFIGURAR O TÍTULO
   const getTitle = () => {
     switch (type) {
-      case 'names': return 'Sorteio de Nomes';
-      case 'numbers': return 'Sorteio de Números';
-      case 'sequence': return 'Sequência de Números';
-      case 'groups': return 'Sorteio de Grupos'; // <--- OBRIGATÓRIO
-      default: return 'Sorteio';
+      case 'names': return t('sortear.cards.namesTitle');
+      case 'numbers': return t('sortear.cards.numbersTitle');
+      case 'sequence': return t('sortear.cards.sequenceTitle');
+      case 'groups': return t('sortear.cards.groupsTitle');
+      default: return t('sortear.header.title');
     }
   };
 
-  // 3. CONFIGURAR A COR DE FUNDO
   const getGradient = (): [string, string] => {
     switch (type) {
       case 'names': return ['#667eea', '#764ba2'];
       case 'numbers': return ['#f093fb', '#f5576c'];
       case 'sequence': return ['#4facfe', '#00f2fe'];
-      case 'groups': return ['#8b5cf6', '#a78bfa']; // <--- OBRIGATÓRIO
+      case 'groups': return ['#8b5cf6', '#a78bfa'];
       default: return ['#667eea', '#764ba2'];
     }
   };
 
-  // 4. CONFIGURAR QUAL TELA MOSTRAR (AQUI ESTÁ O SEU ERRO PROVAVELMENTE)
   const renderForm = () => {
     if (!type) return null;
 
@@ -52,7 +51,7 @@ export function SortearModal({ visible, type, onClose }: SortearModalProps) {
       case 'sequence':
         return <SequenceLotteryForm onClose={onClose} />;
       case 'groups':
-        return <GroupsLotteryForm onClose={onClose} />; // <--- SE NÃO TIVER ISSO, A TELA FICA BRANCA
+        return <GroupsLotteryForm onClose={onClose} />;
       default:
         return null;
     }
@@ -77,7 +76,11 @@ export function SortearModal({ visible, type, onClose }: SortearModalProps) {
             </View>
           </View>
 
-          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <ScrollView 
+            style={styles.content} 
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled" // Importante para inputs em listas
+          >
             {renderForm()}
           </ScrollView>
 

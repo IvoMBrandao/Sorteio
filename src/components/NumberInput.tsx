@@ -1,6 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { Minus, Plus } from 'lucide-react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface NumberInputProps {
   label: string;
@@ -23,9 +23,17 @@ export function NumberInput({
 }: NumberInputProps) {
   const [textValue, setTextValue] = useState(value.toString());
 
+  // Sincroniza o texto interno se o valor mudar externamente (ex: reset de formulário)
+  useEffect(() => {
+    setTextValue(value.toString());
+  }, [value]);
+
   const handleTextChange = (text: string) => {
-    setTextValue(text);
-    const numValue = parseInt(text) || 0;
+    // Remove caracteres não numéricos
+    const cleanedText = text.replace(/[^0-9]/g, '');
+    setTextValue(cleanedText);
+    
+    const numValue = parseInt(cleanedText) || 0;
     if (numValue >= min && numValue <= max) {
       onChangeValue(numValue);
     }
@@ -51,14 +59,21 @@ export function NumberInput({
 
   return (
     <View style={[styles.container, style]}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>
+        {label}
+      </Text>
       <View style={styles.inputContainer}>
         <TouchableOpacity
           style={styles.button}
           onPress={decrement}
           disabled={value <= min}
+          activeOpacity={0.6}
         >
-          <Minus size={16} color={value <= min ? '#94a3b8' : '#475569'} strokeWidth={2.5} />
+          <Minus 
+            size={16} 
+            color={value <= min ? '#94a3b8' : '#475569'} 
+            strokeWidth={2.5} 
+          />
         </TouchableOpacity>
         
         <TextInput
@@ -69,14 +84,20 @@ export function NumberInput({
           keyboardType="numeric"
           textAlign="center"
           selectTextOnFocus
+          placeholderTextColor="#94a3b8"
         />
         
         <TouchableOpacity
           style={styles.button}
           onPress={increment}
           disabled={value >= max}
+          activeOpacity={0.6}
         >
-          <Plus size={16} color={value >= max ? '#94a3b8' : '#475569'} strokeWidth={2.5} />
+          <Plus 
+            size={16} 
+            color={value >= max ? '#94a3b8' : '#475569'} 
+            strokeWidth={2.5} 
+          />
         </TouchableOpacity>
       </View>
     </View>

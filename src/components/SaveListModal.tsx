@@ -1,5 +1,6 @@
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Save } from 'lucide-react-native';
 
 interface SaveListModalProps {
@@ -9,8 +10,8 @@ interface SaveListModalProps {
   itemCount: number;
 }
 
-// O ERRO ESTAVA AQUI: TEM QUE TER A PALAVRA "export" ANTES DE "function"
 export function SaveListModal({ visible, onClose, onSave, itemCount }: SaveListModalProps) {
+  const { t } = useTranslation();
   const [listName, setListName] = useState('');
 
   const handleSave = () => {
@@ -28,29 +29,36 @@ export function SaveListModal({ visible, onClose, onSave, itemCount }: SaveListM
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Salvar Nova Lista</Text>
+            <Text style={styles.title}>
+              {t('names.saveModal.title')}
+            </Text>
             <TouchableOpacity onPress={onClose}>
               <X size={24} color="#64748b" />
             </TouchableOpacity>
           </View>
 
           <Text style={styles.subtitle}>
-            Encontramos <Text style={{fontWeight: 'bold'}}>{itemCount} nomes</Text>. 
-            Qual nome você quer dar para essa lista?
+            {t('names.saveModal.subtitle', { count: itemCount })}
           </Text>
 
           <TextInput
             style={styles.input}
-            placeholder="Ex: Turma da Manhã, Futebol..."
+            placeholder={t('names.saveModal.placeholder')}
             placeholderTextColor="#94a3b8"
             value={listName}
             onChangeText={setListName}
             autoFocus
           />
 
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <TouchableOpacity 
+            style={[styles.saveButton, !listName.trim() && styles.saveButtonDisabled]} 
+            onPress={handleSave}
+            disabled={!listName.trim()}
+          >
             <Save size={20} color="#fff" />
-            <Text style={styles.saveText}>Criar Lista</Text>
+            <Text style={styles.saveText}>
+              {t('names.saveModal.saveButton')}
+            </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -73,6 +81,10 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 16,
     elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   header: {
     flexDirection: 'row',
@@ -106,6 +118,9 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 12,
     gap: 8,
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#94a3b8',
   },
   saveText: {
     color: '#fff',

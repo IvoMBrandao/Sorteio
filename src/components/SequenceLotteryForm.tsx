@@ -1,29 +1,33 @@
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play } from 'lucide-react-native';
 import { useLottery } from '../hooks/useLottery';
 import { FormCard } from './FormCard';
 import { NumberInput } from './NumberInput';
-import { ResultModal as BallResultModal } from './BallResultModal'; // <--- Importando o novo modal
+// CORREÇÃO: Importando como ResultModal e apelidando para evitar conflito
+import { ResultModal as BallResultModal } from './BallResultModal';
 
 interface SequenceLotteryFormProps {
   onClose: () => void;
 }
 
 export function SequenceLotteryForm({ onClose }: SequenceLotteryFormProps) {
+  const { t } = useTranslation();
   const { generateSequence } = useLottery();
   
   const [allowRepetition, setAllowRepetition] = useState(false);
   const [sequenceLength, setSequenceLength] = useState(5);
   const [minValue, setMinValue] = useState(1);
-  const [maxValue, setMaxValue] = useState(60); // Ajustei padrão Mega-sena (60)
+  const [maxValue, setMaxValue] = useState(60); 
   const [result, setResult] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
 
   const handleSortear = () => {
+    // CORREÇÃO: Usando 'quantity' conforme exigido pela interface SortearConfig
     const sequence = generateSequence({
       allowRepetition,
-      sequenceLength,
+      quantity: sequenceLength, 
       minValue,
       maxValue,
     });
@@ -39,33 +43,39 @@ export function SequenceLotteryForm({ onClose }: SequenceLotteryFormProps) {
   return (
     <View style={styles.container}>
       <FormCard>
-        <Text style={styles.sectionTitle}>Intervalo</Text>
+        <Text style={styles.sectionTitle}>
+          {t('sortear.sequenceForm.rangeTitle')}
+        </Text>
         
         <View style={styles.row}>
           <NumberInput
-            label="Mínimo"
+            label={t('sortear.numbersForm.minLabel')}
             value={minValue}
             onChangeValue={setMinValue}
             min={0}
             max={9999}
-            style={{ flex: 1, marginRight: 8 }}
+            style={styles.flexInputLeft}
           />
           <NumberInput
-            label="Máximo"
+            label={t('sortear.numbersForm.maxLabel')}
             value={maxValue}
             onChangeValue={setMaxValue}
             min={1}
             max={9999}
-            style={{ flex: 1, marginLeft: 8 }}
+            style={styles.flexInputRight}
           />
         </View>
       </FormCard>
 
       <FormCard>
-        <Text style={styles.sectionTitle}>Configurações</Text>
+        <Text style={styles.sectionTitle}>
+          {t('sortear.sequenceForm.configTitle')}
+        </Text>
         
         <View style={styles.switchRow}>
-          <Text style={styles.label}>Permitir repetição</Text>
+          <Text style={styles.label}>
+            {t('sortear.numbersForm.allowRepetition')}
+          </Text>
           <Switch
             value={allowRepetition}
             onValueChange={setAllowRepetition}
@@ -75,7 +85,7 @@ export function SequenceLotteryForm({ onClose }: SequenceLotteryFormProps) {
         </View>
 
         <NumberInput
-          label="Quantidade de números"
+          label={t('sortear.numbersForm.quantityLabel')}
           value={sequenceLength}
           onChangeValue={setSequenceLength}
           min={1}
@@ -84,7 +94,7 @@ export function SequenceLotteryForm({ onClose }: SequenceLotteryFormProps) {
 
         {!allowRepetition && sequenceLength > range && range > 0 && (
           <Text style={styles.warning}>
-            Sequência não pode ser maior que o intervalo ({range}) sem repetição
+            {t('sortear.numbersForm.rangeWarning', { range })}
           </Text>
         )}
       </FormCard>
@@ -95,20 +105,21 @@ export function SequenceLotteryForm({ onClose }: SequenceLotteryFormProps) {
         disabled={!canSortear}
       >
         <Play size={20} color="#ffffff" fill="#ffffff" />
-        <Text style={styles.sortearButtonText}>Gerar Sorteio</Text>
+        <Text style={styles.sortearButtonText}>
+          {t('sortear.sequenceForm.submitButton')}
+        </Text>
       </TouchableOpacity>
 
-      {/* Novo Modal de Bolinhas */}
       <BallResultModal
         visible={showResult}
         result={result}
-        sequential={true} // Forçando animação sequencial para dar emoção
-        intervalSeconds={0.8} // Velocidade entre as bolas
+        sequential={true}
+        intervalSeconds={0.8}
         onClose={() => setShowResult(false)}
         onNewDraw={() => {
           setShowResult(false);
           // Pequeno delay para resetar o modal antes de gerar outro
-          setTimeout(() => handleSortear(), 200); 
+          setTimeout(() => handleSortear(), 300); 
         }}
       />
     </View>
@@ -128,6 +139,14 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'flex-end',
+  },
+  flexInputLeft: { 
+    flex: 1, 
+    marginRight: 8 
+  },
+  flexInputRight: { 
+    flex: 1, 
+    marginLeft: 8 
   },
   switchRow: {
     flexDirection: 'row',
@@ -156,7 +175,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     marginTop: 12,
-    // Sombra no botão
     shadowColor: "#10b981",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

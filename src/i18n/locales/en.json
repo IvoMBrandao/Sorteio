@@ -1,0 +1,170 @@
+{
+  "sortear": {
+    "names": {
+      "title": "Name Draw",
+      "description": "Draw names from your saved list"
+    },
+    "numbers": {
+      "title": "Number Draw",
+      "description": "Draw numbers in a range"
+    },
+    "sequence": {
+      "title": "Number Sequence",
+      "description": "Generate a sequence of numbers"
+    },
+    "groups": {
+      "title": "Group Draw",
+      "description": "Distribute participants into groups"
+    }
+  },
+  "header": {
+    "title": "Draw",
+    "subtitle": "Choose the type of draw you want to perform"
+  },
+  "common": {
+    "success": "Success",
+    "wait": "Wait...",
+    "drawAgain": "Draw again",
+    "confirm": "Confirm deletion",
+    "cancel": "Cancel",
+    "remove": "Remove"
+  },
+  "modals": {
+    "titles": {
+      "names": "Name Draw",
+      "numbers": "Number Draw",
+      "sequence": "Number Sequence",
+      "groups": "Group Draw",
+      "default": "Draw"
+    }
+  },
+  "forms": {
+    "names": {
+      "sourceSection": "Who will participate?",
+      "looseNames": "Loose Names",
+      "namesCount": "names",
+      "settingsSection": "Settings",
+      "allowRepetition": "Allow repetition",
+      "quantityLabel": "Number of winners",
+      "emptyWarning": "The selected list is empty. Add names first.",
+      "displaySection": "Result Display",
+      "sequentialReveal": "Reveal one by one",
+      "sequentialDescription": "Creates suspense in the result",
+      "intervalLabel": "Seconds between names",
+      "reverseOrder": "Start from the last",
+      "reverseDescription": "Ideal for podiums (3rd, 2nd, 1st)",
+      "selectedList": "Selected List",
+      "moreNames": "more...",
+      "noNamesFound": "No names found in this list",
+      "drawButton": "Draw Names"
+    },
+    "numbers": {
+      "quantityLabel": "Number of numbers",
+      "intervalLabel": "Interval (seconds)"
+    },
+    "sequence": {
+      "minLabel": "Minimum",
+      "maxLabel": "Maximum",
+      "quantityLabel": "Number of numbers",
+      "rangeLabel": "Range"
+    }
+  },
+  "results": {
+    "wait": "Wait...",
+    "drawAgain": "Draw again",
+    "groups": {
+      "distributing": "Distributing participants...",
+      "finished": "Draw Finished!"
+    }
+  },
+  "names": {
+    "header": {
+      "title": "Names",
+      "subtitle": "Manage your name list for drawing"
+    },
+    "form": {
+      "listDetected": "List detected...",
+      "addNamePlaceholder": "Add name (or paste a list)",
+      "listHelper": "List detected. Click to choose how to save.",
+      "listAlert": {
+        "title": "List Detected",
+        "message": "We identified {{count}} names. What do you want to do?",
+        "cancel": "Cancel",
+        "addIndividual": "Add Individual",
+        "createList": "Create New List"
+      },
+      "success": {
+        "title": "Success",
+        "message": "List \"{{name}}\" created successfully!"
+      }
+    },
+    "list": {
+      "removeConfirm": "Do you want to remove \"{{name}}\"?",
+      "clearTitle": "Clear List",
+      "clearMessage": "Are you sure you want to delete ALL names?"
+    },
+    "edit": {
+      "title": "Edit List",
+      "listNameLabel": "List Name",
+      "membersLabel": "Members",
+      "addPlaceholder": "Add name..."
+    },
+    "import": {
+      "title": "Import Names",
+      "howTo": "How to import?",
+      "instruction": "• Separate names by comma or line break\n• Example: John, Mary, Peter\n• Or one name per line",
+      "inputLabel": "List of names:",
+      "placeholder": "Type or paste the names here...",
+      "button": "Import Names"
+    },
+    "save": {
+      "title": "Save New List",
+      "subtitle": "We found {{count}} names. What name do you want to give this list?",
+      "placeholder": "Ex: Morning Class, Soccer...",
+      "button": "Create List"
+    },
+    "saved": {
+      "deleteTitle": "Delete List",
+      "deleteMessage": "Delete \"{{name}}\"?",
+      "loadTitle": "Load",
+      "loadMessage": "Add names from \"{{name}}\" to current list?",
+      "title": "My Saved Lists"
+    }
+  },
+  "settings": {
+    "header": {
+      "title": "Settings",
+      "subtitle": "Customize your experience"
+    },
+    "sections": {
+      "appearance": "Appearance",
+      "language": "Language",
+      "data": "Data",
+      "about": "About"
+    },
+    "items": {
+      "theme": {
+        "title": "Theme",
+        "dark": "Dark",
+        "light": "Light"
+      },
+      "clearNames": {
+        "title": "Clear Names List",
+        "description": "Remove all saved names"
+      },
+      "resetHistory": {
+        "title": "Reset History",
+        "description": "Clear draw history"
+      },
+      "appInfo": {
+        "title": "App Information",
+        "description": "Version 1.0.0 • Premium"
+      },
+      "language": {
+        "title": "Language",
+        "portuguese": "Portuguese",
+        "english": "English"
+      }
+    }
+  }
+}

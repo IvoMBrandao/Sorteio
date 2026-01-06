@@ -1,0 +1,170 @@
+{
+  "sortear": {
+    "names": {
+      "title": "Sorteio de Nomes",
+      "description": "Sorteie nomes da sua lista salva"
+    },
+    "numbers": {
+      "title": "Sorteio de Números",
+      "description": "Sorteie números em um intervalo"
+    },
+    "sequence": {
+      "title": "Sequência de Números",
+      "description": "Gere uma sequência de números"
+    },
+    "groups": {
+      "title": "Sorteio de Grupos",
+      "description": "Distribua participantes em grupos"
+    }
+  },
+  "header": {
+    "title": "Sortear",
+    "subtitle": "Escolha o tipo de sorteio que deseja realizar"
+  },
+  "common": {
+    "success": "Sucesso",
+    "wait": "Aguarde...",
+    "drawAgain": "Sortear novamente",
+    "confirm": "Confirmar exclusão",
+    "cancel": "Cancelar",
+    "remove": "Remover"
+  },
+  "modals": {
+    "titles": {
+      "names": "Sorteio de Nomes",
+      "numbers": "Sorteio de Números",
+      "sequence": "Sequência de Números",
+      "groups": "Sorteio de Grupos",
+      "default": "Sorteio"
+    }
+  },
+  "forms": {
+    "names": {
+      "sourceSection": "Quem vai participar?",
+      "looseNames": "Nomes Avulsos",
+      "namesCount": "nomes",
+      "settingsSection": "Configurações",
+      "allowRepetition": "Permitir repetição",
+      "quantityLabel": "Quantidade de sorteados",
+      "emptyWarning": "A lista selecionada está vazia. Adicione nomes antes.",
+      "displaySection": "Exibição do Resultado",
+      "sequentialReveal": "Revelar um por um",
+      "sequentialDescription": "Cria suspense no resultado",
+      "intervalLabel": "Segundos entre nomes",
+      "reverseOrder": "Começar do último",
+      "reverseDescription": "Ideal para pódios (3º, 2º, 1º)",
+      "selectedList": "Lista Selecionada",
+      "moreNames": "mais...",
+      "noNamesFound": "Nenhum nome encontrado nesta lista",
+      "drawButton": "Sortear Nomes"
+    },
+    "numbers": {
+      "quantityLabel": "Quantidade de números",
+      "intervalLabel": "Intervalo (segundos)"
+    },
+    "sequence": {
+      "minLabel": "Mínimo",
+      "maxLabel": "Máximo",
+      "quantityLabel": "Quantidade de números",
+      "rangeLabel": "Intervalo"
+    }
+  },
+  "results": {
+    "wait": "Aguarde...",
+    "drawAgain": "Sortear novamente",
+    "groups": {
+      "distributing": "Distribuindo participantes...",
+      "finished": "Sorteio Finalizado!"
+    }
+  },
+  "names": {
+    "header": {
+      "title": "Nomes",
+      "subtitle": "Gerencie sua lista de nomes para sorteio"
+    },
+    "form": {
+      "listDetected": "Lista detectada...",
+      "addNamePlaceholder": "Adicionar nome (ou cole uma lista)",
+      "listHelper": "Lista detectada. Clique para escolher como salvar.",
+      "listAlert": {
+        "title": "Lista Detectada",
+        "message": "Identificamos {{count}} nomes. O que deseja fazer?",
+        "cancel": "Cancelar",
+        "addIndividual": "Adicionar Individuais",
+        "createList": "Criar Nova Lista"
+      },
+      "success": {
+        "title": "Sucesso",
+        "message": "Lista \"{{name}}\" criada com sucesso!"
+      }
+    },
+    "list": {
+      "removeConfirm": "Deseja remover \"{{name}}\"?",
+      "clearTitle": "Limpar Lista",
+      "clearMessage": "Tem certeza que deseja apagar TODOS os nomes?"
+    },
+    "edit": {
+      "title": "Editar Lista",
+      "listNameLabel": "Nome da Lista",
+      "membersLabel": "Integrantes",
+      "addPlaceholder": "Adicionar nome..."
+    },
+    "import": {
+      "title": "Importar Nomes",
+      "howTo": "Como importar?",
+      "instruction": "• Separe os nomes por vírgula ou quebra de linha\n• Exemplo: João, Maria, Pedro\n• Ou um nome por linha",
+      "inputLabel": "Lista de nomes:",
+      "placeholder": "Digite ou cole os nomes aqui...",
+      "button": "Importar Nomes"
+    },
+    "save": {
+      "title": "Salvar Nova Lista",
+      "subtitle": "Encontramos {{count}} nomes. Qual nome você quer dar para essa lista?",
+      "placeholder": "Ex: Turma da Manhã, Futebol...",
+      "button": "Criar Lista"
+    },
+    "saved": {
+      "deleteTitle": "Apagar Lista",
+      "deleteMessage": "Apagar \"{{name}}\"?",
+      "loadTitle": "Carregar",
+      "loadMessage": "Adicionar nomes de \"{{name}}\" à lista atual?",
+      "title": "Minhas Listas Salvas"
+    }
+  },
+  "settings": {
+    "header": {
+      "title": "Configurações",
+      "subtitle": "Personalize sua experiência"
+    },
+    "sections": {
+      "appearance": "Aparência",
+      "language": "Idioma",
+      "data": "Dados",
+      "about": "Sobre"
+    },
+    "items": {
+      "theme": {
+        "title": "Tema",
+        "dark": "Escuro",
+        "light": "Claro"
+      },
+      "clearNames": {
+        "title": "Limpar Lista de Nomes",
+        "description": "Remove todos os nomes salvos"
+      },
+      "resetHistory": {
+        "title": "Resetar Histórico",
+        "description": "Limpa o histórico de sorteios"
+      },
+      "appInfo": {
+        "title": "Informações do App",
+        "description": "Versão 1.0.0 • Premium"
+      },
+      "language": {
+        "title": "Idioma",
+        "portuguese": "Português",
+        "english": "Inglês"
+      }
+    }
+  }
+}

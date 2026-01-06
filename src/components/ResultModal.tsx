@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { X, RotateCcw, Star } from 'lucide-react-native';
@@ -45,51 +46,41 @@ export function ResultModal({
   onClose,
   onNewDraw,
 }: ResultModalProps) {
+  const { t } = useTranslation();
   const [visibleResults, setVisibleResults] = useState<ResultItemData[]>([]);
   const [isSorting, setIsSorting] = useState(false);
   const [runId, setRunId] = useState(0);
   
   const flatListRef = useRef<FlatList>(null);
-
-  /* ⭐ ÍCONE */
   const iconScale = useSharedValue(0);
-
-  /* 🎲 TEXTO SORTEANDO */
   const feedbackOpacity = useSharedValue(0);
 
-  // --- NOVA LÓGICA DE ANIMAÇÃO DO ÍCONE ---
   useEffect(() => {
     if (!visible) {
-      iconScale.value = 0; // Reseta se fechar
+      iconScale.value = 0;
       return;
     }
 
     if (isSorting) {
-      // 🔄 MODO PISCAR: Enquanto estiver sorteando
-      // Ele vai de 1.0 para 1.2 e volta, infinitamente
       iconScale.value = withRepeat(
         withSequence(
           withTiming(1.2, { duration: 400, easing: Easing.inOut(Easing.ease) }),
           withTiming(0.9, { duration: 400, easing: Easing.inOut(Easing.ease) })
         ),
-        -1, // -1 significa repetição infinita
-        true // true faz a animação ir e voltar suavemente
+        -1,
+        true
       );
     } else {
-      // ⏹️ MODO PARADO: Quando acabar, volta ao tamanho normal (1)
-      // Se não for sequencial, faz apenas o efeito de "Pop" inicial
       if (iconScale.value === 0) {
-         // Pop inicial se abriu direto sem animação
-         iconScale.value = withSequence(
-            withTiming(1.2, { duration: 300 }),
-            withTiming(1, { duration: 200 })
-         );
+        iconScale.value = withSequence(
+          withTiming(1.2, { duration: 300 }),
+          withTiming(1, { duration: 200 })
+        );
       } else {
-         // Estabiliza em 1 se estava piscando
-         iconScale.value = withTiming(1, { duration: 300 });
+        iconScale.value = withTiming(1, { duration: 300 });
       }
     }
-  }, [visible, isSorting]); // Monitora 'isSorting' para ativar/desativar o piscar
+  }, [visible, isSorting]);
 
   useEffect(() => {
     if (!visible) return;
@@ -104,7 +95,7 @@ export function ResultModal({
       : [...dataWithPositions];
 
     setVisibleResults([]);
-    setIsSorting(sequential); // Isso vai disparar o efeito de piscar acima
+    setIsSorting(sequential);
 
     if (sequential) {
       feedbackOpacity.value = withRepeat(
@@ -122,17 +113,15 @@ export function ResultModal({
     }
 
     let currentIndex = 0;
-
     const timer = setInterval(() => {
       if (currentIndex >= ordered.length) {
         clearInterval(timer);
-        setIsSorting(false); // Isso vai fazer o ícone parar de piscar
+        setIsSorting(false);
         feedbackOpacity.value = withTiming(0);
         return;
       }
 
       const nextItem = ordered[currentIndex];
-      
       setVisibleResults((prev) => {
         if (prev.find(p => p.position === nextItem.position)) return prev;
         return [...prev, nextItem];
@@ -148,19 +137,13 @@ export function ResultModal({
     transform: [{ scale: iconScale.value }],
   }));
 
-  const feedbackStyle = useAnimatedStyle(() => ({
-    opacity: feedbackOpacity.value,
-  }));
-
   const getTitle = () => {
-    switch (type) {
-      case 'numbers': return 'Números Sorteados';
-      case 'names': return 'Resultado do Sorteio';
-      default: return 'Resultado';
-    }
+    if (type === 'numbers') return t('sortear.result.numbersTitle');
+    if (type === 'names') return t('sortear.result.namesTitle');
+    return t('sortear.result.defaultTitle');
   };
 
-  const getGradient = () => {
+  const getGradient = (): [string, string] => {
     switch (type) {
       case 'numbers': return ['#f093fb', '#f5576c'];
       default: return ['#667eea', '#764ba2'];
@@ -192,14 +175,12 @@ export function ResultModal({
 
               <Text style={styles.title}>{getTitle()}</Text>
 
-            
-
               <FlatList
                 ref={flatListRef}
                 data={visibleResults}
                 keyExtractor={(item) => item.position.toString()}
-                style={{ width: '100%', maxHeight: 300 }}
-                contentContainerStyle={{ gap: 12, paddingBottom: 20 }}
+                style={styles.list}
+                contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
                 onContentSizeChange={() => {
                    if(visibleResults.length > 0) {
@@ -221,9 +202,12 @@ export function ResultModal({
                 onPress={handleNewDraw}
                 disabled={isSorting}
               >
-                <RotateCcw size={20} color={isSorting ? "rgba(255,255,255,0.5)" : "#fff"} />
-                <Text style={[styles.actionText, isSorting && { opacity: 0.5 }]}>
-                  {isSorting ? "Aguarde..." : "Sortear novamente"}
+                <RotateCcw 
+                  size={20} 
+                  color={isSorting ? "rgba(255,255,255,0.5)" : "#fff"} 
+                />
+                <Text style={[styles.actionText, isSorting && styles.disabledText]}>
+                  {isSorting ? t('common.wait') : t('sortear.result.drawAgain')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -247,12 +231,13 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     overflow: 'hidden',
   },
-  safeArea: {},
+  safeArea: {
+    // padding do SafeArea
+  },
   header: {
     alignItems: 'flex-end',
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 0,
   },
   closeButton: {
     width: 40,
@@ -276,7 +261,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 7,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)'
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   title: {
     fontSize: 26,
@@ -285,16 +270,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 3,
   },
-  feedback: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    marginBottom: 8,
-    overflow: 'hidden',
+  list: {
+    width: '100%',
+    maxHeight: 300,
+  },
+  listContent: {
+    gap: 12,
+    paddingBottom: 20,
   },
   resultItem: {
     backgroundColor: '#fff',
@@ -335,11 +317,14 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)'
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   actionText: {
     color: '#fff',
     fontWeight: '700',
     fontSize: 16,
+  },
+  disabledText: {
+    opacity: 0.5,
   },
 });

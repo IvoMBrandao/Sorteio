@@ -1,13 +1,22 @@
+import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
+
+// Componentes Locais
 import { SortearHeader } from '../src/components/SortearHeader';
 import { SortearCard } from '../src/components/SortearCard';
 import { SortearModal } from '../src/components/SortearModal';
-import { useState } from 'react';
+
+// Hooks e Types
+import { useTheme } from '../src/hooks/useTheme';
 import { SortearType } from '../types';
 
 export default function SortearScreen() {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [sortearType, setSortearType] = useState<SortearType | null>(null);
 
@@ -21,38 +30,59 @@ export default function SortearScreen() {
     setSortearType(null);
   };
 
+  // Definição das cores de fundo baseadas no tema
+  const backgroundColors = theme === 'dark' 
+    ? (['#1a1a2e', '#16213e'] as const) 
+    : (['#667eea', '#764ba2'] as const);
+
   return (
     <LinearGradient
-      colors={['#667eea', '#764ba2']}
+      colors={backgroundColors}
       style={styles.container}
     >
-      <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView 
+          style={styles.scrollView} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           <SortearHeader />
           
           <View style={styles.cardsContainer}>
+            {/* Card: Nomes */}
             <SortearCard
-              title="Sorteio de Nomes"
-              description="Sorteie nomes da sua lista salva"
+              title={t('sortear.names.title')}
+              description={t('sortear.names.description')}
               icon="users"
               gradient={['#667eea', '#764ba2']}
               onPress={() => handleOpenModal('names')}
             />
             
+            {/* Card: Números */}
             <SortearCard
-              title="Sorteio de Números"
-              description="Sorteie números em um intervalo"
+              title={t('sortear.numbers.title')}
+              description={t('sortear.numbers.description')}
               icon="hash"
               gradient={['#f093fb', '#f5576c']}
               onPress={() => handleOpenModal('numbers')}
             />
             
+            {/* Card: Sequência */}
             <SortearCard
-              title="Sequência de Números"
-              description="Gere uma sequência de números"
+              title={t('sortear.sequence.title')}
+              description={t('sortear.sequence.description')}
               icon="list"
               gradient={['#4facfe', '#00f2fe']}
               onPress={() => handleOpenModal('sequence')}
+            />
+
+            {/* Card: Grupos (Adicionado conforme seu JSON) */}
+            <SortearCard
+              title={t('sortear.groups.title')}
+              description={t('sortear.groups.description')}
+              icon="grid"
+              gradient={['#43e97b', '#38f9d7']}
+              onPress={() => handleOpenModal('groups')}
             />
           </View>
         </ScrollView>
@@ -73,6 +103,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
   },
   cardsContainer: {
     padding: 20,

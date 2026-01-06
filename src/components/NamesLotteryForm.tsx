@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView } from 'react-native';
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, Users, List, CheckCircle2 } from 'lucide-react-native';
 import { useNames } from '../hooks/useNames';
 import { useLottery } from '../hooks/useLottery';
@@ -12,27 +13,19 @@ interface NamesLotteryFormProps {
 }
 
 export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
-  // 1. DADOS: Pegamos nomes avulsos E listas salvas
+  const { t } = useTranslation();
   const { names: looseNames, savedLists } = useNames();
   const { sortearNames } = useLottery();
   
-  // 2. ESTADOS
-  // Controle da Fonte (Avulso ou Lista Salva)
   const [selectedSourceId, setSelectedSourceId] = useState<string>('loose');
-
-  // Lógica do Sorteio
   const [allowRepetition, setAllowRepetition] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  
-  // Visualização
   const [sequential, setSequential] = useState(true);
   const [intervalSeconds, setIntervalSeconds] = useState(2);
   const [reverseOrder, setReverseOrder] = useState(false);
-
   const [result, setResult] = useState<string[]>([]);
   const [showResult, setShowResult] = useState(false);
 
-  // 3. COMPUTADO: Define qual lista de nomes usar
   const activeNames = useMemo(() => {
     if (selectedSourceId === 'loose') {
       return looseNames.map(n => n.value);
@@ -42,9 +35,7 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
     }
   }, [selectedSourceId, looseNames, savedLists]);
 
-  // 4. AÇÃO DE SORTEAR
   const handleSortear = () => {
-    // Usa activeNames em vez de apenas looseNames
     const sortedNames = sortearNames(activeNames, {
       allowRepetition,
       quantity,
@@ -55,15 +46,16 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
   };
 
   const canSortear = activeNames.length > 0 && quantity > 0;
-  // Se permitir repetição, limite é 50, senão é o tamanho da lista atual
   const maxQuantity = allowRepetition ? 50 : Math.max(activeNames.length, 1);
 
   return (
     <View style={styles.container}>
       
-      {/* --- SEÇÃO 1: SELETOR DE FONTE (QUEM VAI PARTICIPAR?) --- */}
+      {/* SEÇÃO 1: SELETOR DE FONTE */}
       <FormCard>
-        <Text style={styles.sectionTitle}>Quem vai participar?</Text>
+        <Text style={styles.sectionTitle}>
+          {t('sortear.namesForm.sourceTitle')}
+        </Text>
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false} 
@@ -74,7 +66,7 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
             style={[styles.sourceCard, selectedSourceId === 'loose' && styles.selectedSourceCard]}
             onPress={() => {
               setSelectedSourceId('loose');
-              setQuantity(1); // Reseta quantidade ao trocar
+              setQuantity(1);
             }}
           >
             <View style={styles.sourceHeader}>
@@ -83,10 +75,10 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
             </View>
             <View>
               <Text style={[styles.sourceTitle, selectedSourceId === 'loose' && styles.selectedSourceText]}>
-                Nomes Avulsos
+                {t('sortear.namesForm.looseNames')}
               </Text>
               <Text style={[styles.sourceCount, selectedSourceId === 'loose' && styles.selectedSourceText]}>
-                {looseNames.length} nomes
+                {t('sortear.namesForm.namesCount', { count: looseNames.length })}
               </Text>
             </View>
           </TouchableOpacity>
@@ -98,7 +90,7 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
               style={[styles.sourceCard, selectedSourceId === list.id && styles.selectedSourceCard]}
               onPress={() => {
                 setSelectedSourceId(list.id);
-                setQuantity(1); // Reseta quantidade ao trocar
+                setQuantity(1);
               }}
             >
               <View style={styles.sourceHeader}>
@@ -110,7 +102,7 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
                   {list.title}
                 </Text>
                 <Text style={[styles.sourceCount, selectedSourceId === list.id && styles.selectedSourceText]}>
-                  {list.names.length} nomes
+                  {t('sortear.namesForm.namesCount', { count: list.names.length })}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -118,12 +110,14 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
         </ScrollView>
       </FormCard>
 
-      {/* --- SEÇÃO 2: CONFIGURAÇÕES --- */}
+      {/* SEÇÃO 2: CONFIGURAÇÕES */}
       <FormCard>
-        <Text style={styles.sectionTitle}>Configurações</Text>
+        <Text style={styles.sectionTitle}>
+          {t('sortear.namesForm.configTitle')}
+        </Text>
         
         <View style={styles.row}>
-          <Text style={styles.label}>Permitir repetição</Text>
+          <Text style={styles.label}>{t('sortear.namesForm.allowRepetition')}</Text>
           <Switch
             value={allowRepetition}
             onValueChange={setAllowRepetition}
@@ -133,28 +127,30 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
         </View>
 
         <NumberInput
-          label="Quantidade de sorteados"
+          label={t('sortear.namesForm.quantityLabel')}
           value={quantity}
           onChangeValue={setQuantity}
           min={1}
-          max={maxQuantity} // Máximo dinâmico baseado na lista selecionada
+          max={maxQuantity}
         />
 
         {activeNames.length === 0 && (
           <Text style={styles.warning}>
-            A lista selecionada está vazia. Adicione nomes antes.
+            {t('sortear.namesForm.emptyListWarning')}
           </Text>
         )}
       </FormCard>
 
-      {/* --- SEÇÃO 3: EXIBIÇÃO --- */}
+      {/* SEÇÃO 3: EXIBIÇÃO */}
       <FormCard>
-        <Text style={styles.sectionTitle}>Exibição do Resultado</Text>
+        <Text style={styles.sectionTitle}>
+          {t('sortear.namesForm.displayTitle')}
+        </Text>
 
         <View style={styles.row}>
           <View>
-            <Text style={styles.label}>Revelar um por um</Text>
-            <Text style={styles.subLabel}>Cria suspense no resultado</Text>
+            <Text style={styles.label}>{t('sortear.namesForm.sequentialLabel')}</Text>
+            <Text style={styles.subLabel}>{t('sortear.namesForm.sequentialSublabel')}</Text>
           </View>
           <Switch
             value={sequential}
@@ -167,7 +163,7 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
         {sequential && (
           <View style={{ marginBottom: 16 }}>
             <NumberInput
-              label="Segundos entre nomes"
+              label={t('sortear.namesForm.intervalLabel')}
               value={intervalSeconds}
               onChangeValue={setIntervalSeconds}
               min={1}
@@ -180,8 +176,8 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
 
         <View style={styles.row}>
            <View>
-            <Text style={styles.label}>Começar do último</Text>
-            <Text style={styles.subLabel}>Ideal para pódios (3º, 2º, 1º)</Text>
+            <Text style={styles.label}>{t('sortear.namesForm.reverseLabel')}</Text>
+            <Text style={styles.subLabel}>{t('sortear.namesForm.reverseSublabel')}</Text>
           </View>
           <Switch
             value={reverseOrder}
@@ -192,10 +188,10 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
         </View>
       </FormCard>
 
-      {/* --- SEÇÃO 4: PREVIEW DA LISTA SELECIONADA --- */}
+      {/* SEÇÃO 4: PREVIEW */}
       <FormCard>
         <Text style={styles.sectionTitle}>
-          Lista Selecionada ({activeNames.length})
+          {t('sortear.namesForm.previewTitle', { count: activeNames.length })}
         </Text>
         {activeNames.length > 0 ? (
           <View style={styles.namesList}>
@@ -206,13 +202,13 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
             ))}
             {activeNames.length > 5 && (
               <Text style={styles.moreNames}>
-                +{activeNames.length - 5} mais...
+                {t('sortear.namesForm.moreNames', { count: activeNames.length - 5 })}
               </Text>
             )}
           </View>
         ) : (
           <Text style={styles.emptyMessage}>
-            Nenhum nome encontrado nesta lista
+            {t('sortear.namesForm.noNamesFound')}
           </Text>
         )}
       </FormCard>
@@ -224,7 +220,9 @@ export function NamesLotteryForm({ onClose }: NamesLotteryFormProps) {
         disabled={!canSortear}
       >
         <Play size={20} color="#ffffff" fill="#ffffff" />
-        <Text style={styles.sortearButtonText}>Sortear Nomes</Text>
+        <Text style={styles.sortearButtonText}>
+          {t('sortear.namesForm.submitButton')}
+        </Text>
       </TouchableOpacity>
 
       <ResultModal
@@ -255,9 +253,10 @@ const styles = StyleSheet.create({
     color: '#1e293b',
     marginBottom: 16,
   },
-  
-  // --- Estilos do Carrossel (Copiados para consistência) ---
-  sourcesContainer: { gap: 12, paddingRight: 10 },
+  sourcesContainer: { 
+    gap: 12, 
+    paddingRight: 10 
+  },
   sourceCard: { 
     width: 140, 
     backgroundColor: '#f8fafc', 
@@ -267,23 +266,38 @@ const styles = StyleSheet.create({
     borderWidth: 2, 
     borderColor: 'transparent',
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { 
+      width: 0, 
+      height: 1 
+    },
     shadowOpacity: 0.05,
     elevation: 1,
   },
   selectedSourceCard: { 
-    backgroundColor: '#6366f1', // Azul/Roxo para diferenciar do roxo de Grupos
+    backgroundColor: '#6366f1', 
     borderColor: '#4f46e5', 
     shadowOpacity: 0.2, 
     shadowColor: "#6366f1", 
     elevation: 4 
   },
-  sourceHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  sourceTitle: { fontWeight: '700', color: '#334155', fontSize: 14, marginBottom: 2 },
-  sourceCount: { fontSize: 12, color: '#64748b' },
-  selectedSourceText: { color: '#ffffff' },
-
-  // --- Estilos Gerais ---
+  sourceHeader: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center' 
+  },
+  sourceTitle: { 
+    fontWeight: '700', 
+    color: '#334155', 
+    fontSize: 14, 
+    marginBottom: 2 
+  },
+  sourceCount: { 
+    fontSize: 12, 
+    color: '#64748b' 
+  },
+  selectedSourceText: { 
+    color: '#ffffff' 
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -343,7 +357,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 12,
     shadowColor: "#10b981",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { 
+      width: 0, 
+      height: 4 
+    },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,

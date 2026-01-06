@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play } from 'lucide-react-native';
 import { useLottery } from '../hooks/useLottery';
 import { FormCard } from './FormCard';
@@ -11,6 +12,7 @@ interface NumbersLotteryFormProps {
 }
 
 export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
+  const { t } = useTranslation();
   const { sortearNumbers } = useLottery();
 
   const [allowRepetition, setAllowRepetition] = useState(false);
@@ -21,7 +23,6 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
   const [result, setResult] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
 
-  // 🔥 opções novas
   const [sequential, setSequential] = useState(false);
   const [intervalSeconds, setIntervalSeconds] = useState(2);
   const [reverseOrder, setReverseOrder] = useState(false);
@@ -45,33 +46,39 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
   return (
     <View style={styles.container}>
       <FormCard>
-        <Text style={styles.sectionTitle}>Intervalo</Text>
+        <Text style={styles.sectionTitle}>
+          {t('sortear.numbersForm.rangeTitle')}
+        </Text>
 
         <View style={styles.row}>
           <NumberInput
-            label="Mínimo"
+            label={t('sortear.numbersForm.minLabel')}
             value={minValue}
             onChangeValue={setMinValue}
             min={-9999}
             max={9999}
-            style={{ flex: 1, marginRight: 8 }}
+            style={styles.flexInputLeft}
           />
           <NumberInput
-            label="Máximo"
+            label={t('sortear.numbersForm.maxLabel')}
             value={maxValue}
             onChangeValue={setMaxValue}
             min={-9999}
             max={9999}
-            style={{ flex: 1, marginLeft: 8 }}
+            style={styles.flexInputRight}
           />
         </View>
       </FormCard>
 
       <FormCard>
-        <Text style={styles.sectionTitle}>Configurações</Text>
+        <Text style={styles.sectionTitle}>
+          {t('sortear.numbersForm.configTitle')}
+        </Text>
 
         <View style={styles.switchRow}>
-          <Text style={styles.label}>Permitir repetição</Text>
+          <Text style={styles.label}>
+            {t('sortear.numbersForm.allowRepetition')}
+          </Text>
           <Switch
             value={allowRepetition}
             onValueChange={setAllowRepetition}
@@ -81,7 +88,7 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
         </View>
 
         <NumberInput
-          label="Quantidade de números"
+          label={t('sortear.numbersForm.quantityLabel')}
           value={quantity}
           onChangeValue={setQuantity}
           min={1}
@@ -89,7 +96,9 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
         />
 
         <View style={styles.switchRow}>
-          <Text style={styles.label}>Mostrar números um por um</Text>
+          <Text style={styles.label}>
+            {t('sortear.numbersForm.sequentialLabel')}
+          </Text>
           <Switch
             value={sequential}
             onValueChange={setSequential}
@@ -101,7 +110,7 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
         {sequential && (
           <>
             <NumberInput
-              label="Intervalo (segundos)"
+              label={t('sortear.numbersForm.intervalLabel')}
               value={intervalSeconds}
               onChangeValue={setIntervalSeconds}
               min={1}
@@ -110,7 +119,7 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
 
             <View style={styles.switchRow}>
               <Text style={styles.label}>
-                Começar do último para o primeiro
+                {t('sortear.numbersForm.reverseLabel')}
               </Text>
               <Switch
                 value={reverseOrder}
@@ -124,7 +133,7 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
 
         {!allowRepetition && quantity > range && range > 0 && (
           <Text style={styles.warning}>
-            Quantidade não pode ser maior que o intervalo ({range}) sem repetição
+            {t('sortear.numbersForm.rangeWarning', { range })}
           </Text>
         )}
       </FormCard>
@@ -138,7 +147,9 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
         disabled={!canSortear}
       >
         <Play size={20} color="#ffffff" fill="#ffffff" />
-        <Text style={styles.sortearButtonText}>Sortear Números</Text>
+        <Text style={styles.sortearButtonText}>
+          {t('sortear.numbersForm.submitButton')}
+        </Text>
       </TouchableOpacity>
 
       <ResultModal
@@ -159,14 +170,26 @@ export function NumbersLotteryForm({ onClose }: NumbersLotteryFormProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 20 },
+  container: { 
+    gap: 20, 
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1e293b',
     marginBottom: 16,
   },
-  row: { flexDirection: 'row' },
+  row: { 
+    flexDirection: 'row', 
+  },
+  flexInputLeft: { 
+    flex: 1, 
+    marginRight: 8, 
+  },
+  flexInputRight: { 
+    flex: 1, 
+    marginLeft: 8, 
+  },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -193,7 +216,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
   },
-  sortearButtonDisabled: { backgroundColor: '#94a3b8' },
+  sortearButtonDisabled: { 
+    backgroundColor: '#94a3b8', 
+  },
   sortearButtonText: {
     color: '#ffffff',
     fontSize: 16,

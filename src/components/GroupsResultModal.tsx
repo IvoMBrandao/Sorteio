@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next'; // Adicionado
 import { X, RotateCcw, Users, User } from 'lucide-react-native';
 import Animated, {
   useSharedValue,
@@ -29,7 +30,7 @@ interface GroupsResultModalProps {
   result: string[];
   onClose: () => void;
   onNewDraw: () => void;
-  sequential?: boolean; // <--- Essa propriedade controla o tipo de animação
+  sequential?: boolean; 
 }
 
 export function GroupsResultModal({
@@ -39,6 +40,7 @@ export function GroupsResultModal({
   onNewDraw,
   sequential = false, 
 }: GroupsResultModalProps) {
+  const { t } = useTranslation();
   const [visibleGroups, setVisibleGroups] = useState<string[][]>([]);
   const [isSorting, setIsSorting] = useState(false);
   
@@ -46,7 +48,6 @@ export function GroupsResultModal({
   const queueRef = useRef<AnimationQueueItem[]>([]);
   const iconScale = useSharedValue(0);
 
-  // Zera tudo quando fecha
   useEffect(() => {
     if (!visible) {
       setVisibleGroups([]);
@@ -57,25 +58,18 @@ export function GroupsResultModal({
   useEffect(() => {
     if (!visible) return;
 
-    // Animação do ícone
     iconScale.value = withSequence(
       withTiming(0),
       withTiming(1.2, { duration: 400 }),
       withTiming(1, { duration: 200 })
     );
 
-    // 1. Processa os grupos vindos do resultado
     const parsedGroups = result.map(g => g.split(', ').filter(n => n));
-    
-    // Inicia visualmente vazio
     setVisibleGroups(parsedGroups.map(() => []));
     
     const newQueue: AnimationQueueItem[] = [];
 
-    // --- AQUI ESTÁ A CORREÇÃO DA LÓGICA VISUAL ---
     if (sequential) {
-      // MODO SEQUENCIAL (Preencher Grupo):
-      // Anima: Grupo 1 inteiro -> Grupo 2 inteiro...
       parsedGroups.forEach((groupMembers, groupIndex) => {
         groupMembers.forEach(member => {
           newQueue.push({
@@ -85,12 +79,9 @@ export function GroupsResultModal({
         });
       });
     } else {
-      // MODO INTERCALADO (Baralho):
-      // Anima: G1-Item1 -> G2-Item1 -> G1-Item2 -> G2-Item2...
       const maxMembers = Math.max(...parsedGroups.map(g => g.length));
       for (let i = 0; i < maxMembers; i++) {
         for (let groupIdx = 0; groupIdx < parsedGroups.length; groupIdx++) {
-          // Verifica se existe membro nessa posição para esse grupo
           if (parsedGroups[groupIdx][i]) {
             newQueue.push({
               groupIndex: groupIdx,
@@ -104,7 +95,6 @@ export function GroupsResultModal({
     queueRef.current = newQueue;
     setIsSorting(true);
 
-    // Se for sequencial (encher grupo), a animação pode ser mais rápida
     const speed = sequential ? 300 : 600;
     let currentIndex = 0;
 
@@ -124,7 +114,6 @@ export function GroupsResultModal({
         return newGroups;
       });
 
-      // Scroll automático se estiver preenchendo grupos lá embaixo
       if (item.groupIndex > 1) {
          scrollViewRef.current?.scrollToEnd({ animated: true });
       }
@@ -133,7 +122,7 @@ export function GroupsResultModal({
     }, speed);
 
     return () => clearInterval(timer);
-  }, [visible, result, sequential]); // Dependências importantes
+  }, [visible, result, sequential]);
 
   const iconStyle = useAnimatedStyle(() => ({
     transform: [{ scale: iconScale.value }],
@@ -160,9 +149,14 @@ export function GroupsResultModal({
               <Users size={40} color="#fff" fill="#fff" />
             </Animated.View>
 
-            <Text style={styles.title}>Grupos Formados</Text>
+            <Text style={styles.title}>
+              {t('sortear.groupsResult.title')}
+            </Text>
             <Text style={styles.subtitle}>
-              {isSorting ? "Distribuindo participantes..." : "Sorteio Finalizado!"}
+              {isSorting 
+                ? t('sortear.groupsResult.statusSorting') 
+                : t('sortear.groupsResult.statusFinished')
+              }
             </Text>
 
             <ScrollView 
@@ -179,7 +173,9 @@ export function GroupsResultModal({
                   style={styles.groupCard}
                 >
                   <View style={styles.groupHeader}>
-                    <Text style={styles.groupTitle}>Grupo {index + 1}</Text>
+                    <Text style={styles.groupTitle}>
+                      {t('sortear.groupsResult.groupLabel')} {index + 1}
+                    </Text>
                     <View style={styles.badge}>
                       <Text style={styles.badgeText}>{members.length}</Text>
                     </View>
@@ -197,7 +193,9 @@ export function GroupsResultModal({
                       </Animated.View>
                     ))}
                     {members.length === 0 && isSorting && (
-                      <Text style={styles.emptyText}>Aguardando...</Text>
+                      <Text style={styles.emptyText}>
+                        {t('sortear.groupsResult.waiting')}
+                      </Text>
                     )}
                   </View>
                 </Animated.View>
@@ -211,7 +209,10 @@ export function GroupsResultModal({
             >
               <RotateCcw size={20} color={isSorting ? "rgba(255,255,255,0.5)" : "#fff"} />
               <Text style={[styles.actionText, isSorting && { opacity: 0.5 }]}>
-                {isSorting ? "Sorteando..." : "Sortear novamente"}
+                {isSorting 
+                  ? t('common.sorting') 
+                  : t('sortear.groupsResult.drawAgain')
+                }
               </Text>
             </TouchableOpacity>
           </View>
@@ -235,7 +236,10 @@ const styles = StyleSheet.create({
     height: '85%',
     borderRadius: 24,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
     shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 10,
@@ -269,7 +273,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.3)',
-    marginTop: -10
+    marginTop: -10,
   },
   title: {
     fontSize: 24,
@@ -337,7 +341,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
@@ -364,7 +371,7 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)'
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   actionText: {
     color: '#fff',

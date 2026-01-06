@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Edit3, Trash2, Check, X } from 'lucide-react-native';
 import { Name } from '../../types';
 import { useState } from 'react';
@@ -12,10 +13,11 @@ interface NamesListProps {
   names: Name[];
   onRemoveName: (id: string) => void;
   onEditName: (id: string, newValue: string) => void;
-  onClearAll?: () => void; // <--- NOVA PROPRIEDADE OPCIONAL
+  onClearAll?: () => void;
 }
 
 export function NamesList({ names, onRemoveName, onEditName, onClearAll }: NamesListProps) {
+  const { t } = useTranslation();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
 
@@ -39,24 +41,31 @@ export function NamesList({ names, onRemoveName, onEditName, onClearAll }: Names
 
   const handleRemove = (name: Name) => {
     Alert.alert(
-      'Confirmar exclusão',
-      `Deseja remover "${name.value}"?`,
+      t('names.list.removeConfirmTitle'),
+      t('names.list.removeConfirmDesc', { name: name.value }),
       [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Remover', style: 'destructive', onPress: () => onRemoveName(name.id) },
+        { text: t('common.cancel'), style: 'cancel' },
+        { 
+          text: t('common.remove'), 
+          style: 'destructive', 
+          onPress: () => onRemoveName(name.id) 
+        },
       ]
     );
   };
 
-  // Nova função para limpar tudo com confirmação
   const handleClearAll = () => {
     if (!onClearAll) return;
     Alert.alert(
-      'Limpar Lista',
-      'Tem certeza que deseja apagar TODOS os nomes?',
+      t('names.list.clearAllTitle'),
+      t('names.list.clearAllDesc'),
       [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Apagar Tudo', style: 'destructive', onPress: onClearAll },
+        { text: t('common.cancel'), style: 'cancel' },
+        { 
+          text: t('names.list.clearAllConfirm'), 
+          style: 'destructive', 
+          onPress: onClearAll 
+        },
       ]
     );
   };
@@ -64,9 +73,11 @@ export function NamesList({ names, onRemoveName, onEditName, onClearAll }: Names
   if (names.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>Sua lista está vazia</Text>
+        <Text style={styles.emptyText}>
+          {t('names.list.emptyTitle')}
+        </Text>
         <Text style={styles.emptySubtext}>
-          Adicione nomes um por um ou cole uma lista separada por vírgulas.
+          {t('names.list.emptySubtitle')}
         </Text>
       </View>
     );
@@ -74,12 +85,15 @@ export function NamesList({ names, onRemoveName, onEditName, onClearAll }: Names
 
   return (
     <View style={styles.container}>
-      {/* HEADER DA LISTA COM BOTÃO LIMPAR */}
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Lista de Nomes ({names.length})</Text>
+        <Text style={styles.title}>
+          {t('names.list.countTitle', { count: names.length })}
+        </Text>
         {onClearAll && (
           <TouchableOpacity onPress={handleClearAll} style={styles.clearAllButton}>
-            <Text style={styles.clearAllText}>Limpar</Text>
+            <Text style={styles.clearAllText}>
+              {t('names.list.clearAllButton')}
+            </Text>
             <Trash2 size={16} color="#ef4444" />
           </TouchableOpacity>
         )}
@@ -145,7 +159,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
@@ -254,7 +271,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
