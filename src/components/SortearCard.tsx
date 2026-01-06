@@ -1,11 +1,10 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Users, Hash, List, Grid, LucideIcon } from 'lucide-react-native';
+import { Users, Hash, List, Grid, LucideIcon, Zap } from 'lucide-react-native';
 
 // Tipos de ícones permitidos para manter a consistência visual
-export type SortearIconType = 'users' | 'hash' | 'list' | 'grid';
-
+export type SortearIconType = 'users' | 'hash' | 'list' | 'grid' | 'zap';
 interface SortearCardProps {
   title: string;
   description: string;
@@ -20,6 +19,7 @@ const iconMap: Record<SortearIconType, LucideIcon> = {
   hash: Hash,
   list: List,
   grid: Grid,
+  zap:Zap,
 };
 
 export function SortearCard({ title, description, icon, gradient, onPress }: SortearCardProps) {

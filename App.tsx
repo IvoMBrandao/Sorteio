@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { 
   Dice6, 
   Users, 
+  Zap,
   Settings, 
   Moon, 
   Sun, 
@@ -24,6 +25,8 @@ import {
 import { SortearHeader } from './src/components/SortearHeader';
 import { SortearCard } from './src/components/SortearCard';
 import { SortearModal } from './src/components/SortearModal';
+import { AdvancedRaffleModal } from './src/components/AdvancedRaffleModal'; // <--- NOVO IMPORT
+
 import { NamesHeader } from './src/components/NamesHeader';
 import { AddNameForm } from './src/components/AddNameForm';
 import { NamesList } from './src/components/NamesList';
@@ -49,6 +52,9 @@ function SortearScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [sortearType, setSortearType] = useState<SortearType | null>(null);
 
+  // NOVO ESTADO para controlar o modal avançado
+  const [advancedModalVisible, setAdvancedModalVisible] = useState(false);
+
   const handleOpenModal = (type: SortearType) => {
     setSortearType(type);
     setModalVisible(true);
@@ -61,7 +67,7 @@ function SortearScreen() {
 
   return (
     <LinearGradient 
-      colors={isDark ? ['#1a1a2e', '#16213e'] as const : ['#667eea', '#764ba2'] as const} 
+      colors={isDark ? ['#1a1a2e', '#16213e'] : ['#667eea', '#764ba2']} 
       style={styles.container}
     >
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -69,42 +75,60 @@ function SortearScreen() {
           <SortearHeader />
           
           <View style={styles.cardsContainer}>
+            
+            {/* --- NOVO CARD: SORTEIO AVANÇADO --- */}
+            <SortearCard
+              title="Sorteio Avançado" 
+              description="Pesos e Eliminação" 
+              icon="zap" 
+              gradient={['#fbbf24', '#d97706']} 
+              onPress={() => setAdvancedModalVisible(true)}
+            />
+
             <SortearCard
               title={t('sortear.names.title')}
               description={t('sortear.names.description')}
               icon="users"
-              gradient={['#667eea', '#764ba2'] as const}
+              gradient={['#667eea', '#764ba2']}
               onPress={() => handleOpenModal('names')}
             />
             <SortearCard
               title={t('sortear.numbers.title')}
               description={t('sortear.numbers.description')}
               icon="hash"
-              gradient={['#f093fb', '#f5576c'] as const}
+              gradient={['#f093fb', '#f5576c']}
               onPress={() => handleOpenModal('numbers')}
             />
             <SortearCard
               title={t('sortear.sequence.title')}
               description={t('sortear.sequence.description')}
               icon="list"
-              gradient={['#4facfe', '#00f2fe'] as const}
+              gradient={['#4facfe', '#00f2fe']}
               onPress={() => handleOpenModal('sequence')}
             />
             <SortearCard
               title={t('sortear.groups.title')}
               description={t('sortear.groups.description')}
               icon="grid" 
-              gradient={['#8b5cf6', '#a78bfa'] as const}
+              gradient={['#8b5cf6', '#a78bfa']}
               onPress={() => handleOpenModal('groups')}
             />
           </View>
         </ScrollView>
 
+        {/* Modal Padrão */}
         <SortearModal
           visible={modalVisible}
           type={sortearType}
           onClose={handleCloseModal}
         />
+
+        {/* --- NOVO MODAL --- */}
+        <AdvancedRaffleModal 
+          visible={advancedModalVisible}
+          onClose={() => setAdvancedModalVisible(false)}
+        />
+
       </SafeAreaView>
     </LinearGradient>
   );
@@ -130,7 +154,7 @@ function NamesScreen() {
 
   return (
     <LinearGradient
-      colors={isDark ? ['#1a1a2e', '#16213e'] as const : ['#667eea', '#764ba2'] as const}
+      colors={isDark ? ['#1a1a2e', '#16213e'] : ['#667eea', '#764ba2']}
       style={styles.container}
     >
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -189,7 +213,7 @@ function SettingsScreen() {
 
   return (
     <LinearGradient
-      colors={isDark ? ['#1a1a2e', '#16213e'] as const : ['#667eea', '#764ba2'] as const}
+      colors={isDark ? ['#1a1a2e', '#16213e'] : ['#667eea', '#764ba2']}
       style={styles.container}
     >
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -261,7 +285,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        id="MainTabNavigator" // Correção do erro de ID do TS
+        id="MainTabNavigator"
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: isDark ? '#818cf8' : '#6366f1',
@@ -316,8 +340,18 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollView: { flex: 1 },
-  cardsContainer: { padding: 20, gap: 16 },
-  contentPadded: { padding: 20, gap: 20 },
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  cardsContainer: {
+    padding: 20,
+    gap: 16,
+  },
+  contentPadded: {
+    padding: 20,
+    gap: 20,
+  },
 });
